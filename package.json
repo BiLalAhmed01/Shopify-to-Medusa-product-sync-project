@@ -1,0 +1,33 @@
+{
+  "name": "shopify-medusa-sync",
+  "version": "1.0.0",
+  "private": true,
+  "description": "One-way product sync from Shopify (GraphQL Admin API) to MedusaJS v2 (Admin REST API).",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "tsx src/index.ts check",
+    "sync": "tsx src/index.ts sync",
+    "sync:dry": "tsx src/index.ts sync --dry-run",
+    "sync:full": "tsx src/index.ts sync --full",
+    "test": "tsx --test src/**/*.test.ts",
+    "webhooks": "tsx src/webhook-server.ts",
+    "demo": "node tools/demo.mjs",
+    "mock": "node tools/mock-server.mjs",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js sync",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.10",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3"
+  }
+}
