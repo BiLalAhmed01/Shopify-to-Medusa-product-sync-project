@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shopify → Medusa Sync</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Shopify <span class="arrow">→</span> Medusa Sync</h1>
+    <div id="connection-summary" class="muted">loading…</div>
+  </header>
+
+  <main>
+    <section class="card" id="checks-card">
+      <div class="card-head">
+        <h2>Connections</h2>
+        <button id="check-btn" class="btn btn-secondary">Test connection</button>
+      </div>
+      <ul id="checks-list" class="checks">
+        <li class="muted">Not checked yet.</li>
+      </ul>
+    </section>
+
+    <section class="card" id="sync-card">
+      <div class="card-head">
+        <h2>Run a sync</h2>
+        <span id="busy-badge" class="badge hidden">running…</span>
+      </div>
+
+      <form id="sync-form">
+        <label class="check-row">
+          <input type="checkbox" id="opt-full" />
+          Full sync (ignore last-run timestamp)
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="opt-dry-run" checked />
+          Dry run (write nothing)
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="opt-force" />
+          Force (rewrite unchanged products)
+        </label>
+        <label class="field-row">
+          Limit
+          <input type="number" id="opt-limit" min="1" placeholder="no limit" />
+        </label>
+        <button type="submit" id="sync-btn" class="btn btn-primary">Run sync</button>
+      </form>
+
+      <dl class="status-grid">
+        <dt>Last run</dt><dd id="last-run">—</dd>
+        <dt>Tracked products</dt><dd id="tracked-products">—</dd>
+      </dl>
+
+      <div id="summary" class="summary hidden">
+        <div class="summary-item"><span id="sum-scanned">0</span><label>scanned</label></div>
+        <div class="summary-item ok"><span id="sum-created">0</span><label>created</label></div>
+        <div class="summary-item ok"><span id="sum-updated">0</span><label>updated</label></div>
+        <div class="summary-item"><span id="sum-skipped">0</span><label>skipped</label></div>
+        <div class="summary-item err"><span id="sum-failed">0</span><label>failed</label></div>
+      </div>
+    </section>
+
+    <section class="card wide" id="logs-card">
+      <div class="card-head">
+        <h2>Live log</h2>
+        <button id="clear-log-btn" class="btn btn-secondary">Clear</button>
+      </div>
+      <pre id="log-console"></pre>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

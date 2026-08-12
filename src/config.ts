@@ -52,6 +52,10 @@ export const config = {
     webhookPort: int("WEBHOOK_PORT", 4000),
   },
 
+  dashboard: {
+    port: int("DASHBOARD_PORT", 5050),
+  },
+
   medusa: {
     baseUrl: str("MEDUSA_BACKEND_URL", "http://localhost:9000").replace(/\/$/, ""),
     email: optional("MEDUSA_ADMIN_EMAIL"),

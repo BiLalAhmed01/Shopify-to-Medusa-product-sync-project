@@ -14,6 +14,7 @@
     "sync:full": "tsx src/index.ts sync --full",
     "test": "tsx --test src/**/*.test.ts",
     "webhooks": "tsx src/webhook-server.ts",
+    "dashboard": "tsx src/dashboard-server.ts",
     "demo": "node tools/demo.mjs",
     "mock": "node tools/mock-server.mjs",
     "build": "tsc -p tsconfig.json",
