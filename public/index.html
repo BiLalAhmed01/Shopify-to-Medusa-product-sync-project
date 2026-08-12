@@ -4,73 +4,154 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Shopify → Medusa Sync</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <header>
-    <h1>Shopify <span class="arrow">→</span> Medusa Sync</h1>
-    <div id="connection-summary" class="muted">loading…</div>
+  <div class="bg-decor" aria-hidden="true">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+    <span class="grid-lines"></span>
+    <span class="grain"></span>
+  </div>
+
+  <nav class="topnav">
+    <div class="brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 17L10 11L14 15L20 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 7H20V13" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <div class="brand-text">
+        <span class="brand-title">Syncline</span>
+        <span class="brand-sub">Shopify → Medusa</span>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <span class="live-chip"><i class="live-dot"></i>Local environment</span>
+      <div id="connection-summary" class="pill mono muted">loading…</div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <h1>Sync control center</h1>
+    <p>Pull product catalogue, images, categories, prices and stock levels from Shopify straight into MedusaJS — idempotent, incremental, and safe to re-run.</p>
   </header>
 
   <main>
-    <section class="card" id="checks-card">
-      <div class="card-head">
-        <h2>Connections</h2>
-        <button id="check-btn" class="btn btn-secondary">Test connection</button>
+    <section class="stats-row">
+      <div class="stat-tile">
+        <div class="stat-icon icon-clock">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7V12L15.5 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <span class="stat-label">Last run</span>
+          <span id="last-run" class="stat-value mono">—</span>
+        </div>
       </div>
-      <ul id="checks-list" class="checks">
-        <li class="muted">Not checked yet.</li>
-      </ul>
+
+      <div class="stat-tile">
+        <div class="stat-icon icon-box">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 8L12 3L21 8V16L12 21L3 16V8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3 8L12 13L21 8" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 13V21" stroke="currentColor" stroke-width="1.8"/></svg>
+        </div>
+        <div>
+          <span class="stat-label">Tracked products</span>
+          <span id="tracked-products" class="stat-value mono">—</span>
+        </div>
+      </div>
+
+      <div class="stat-tile">
+        <div class="stat-icon icon-pulse">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 12H7L9.5 5L14.5 19L17 12H21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <span class="stat-label">Engine status</span>
+          <span id="busy-badge" class="stat-value status-idle">Idle</span>
+        </div>
+      </div>
     </section>
 
-    <section class="card" id="sync-card">
-      <div class="card-head">
-        <h2>Run a sync</h2>
-        <span id="busy-badge" class="badge hidden">running…</span>
-      </div>
+    <div class="grid-2">
+      <section class="card" id="checks-card">
+        <div class="card-head">
+          <div class="card-title">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L20 6V12C20 16.5 16.5 20.5 12 22C7.5 20.5 4 16.5 4 12V6L12 2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            </span>
+            <h2>Connections</h2>
+          </div>
+          <button id="check-btn" class="btn btn-ghost">Test connection</button>
+        </div>
+        <ul id="checks-list" class="checks">
+          <li class="muted empty-state">Run a check to verify Shopify and Medusa credentials.</li>
+        </ul>
+      </section>
 
-      <form id="sync-form">
-        <label class="check-row">
-          <input type="checkbox" id="opt-full" />
-          Full sync (ignore last-run timestamp)
-        </label>
-        <label class="check-row">
-          <input type="checkbox" id="opt-dry-run" checked />
-          Dry run (write nothing)
-        </label>
-        <label class="check-row">
-          <input type="checkbox" id="opt-force" />
-          Force (rewrite unchanged products)
-        </label>
-        <label class="field-row">
-          Limit
-          <input type="number" id="opt-limit" min="1" placeholder="no limit" />
-        </label>
-        <button type="submit" id="sync-btn" class="btn btn-primary">Run sync</button>
-      </form>
+      <section class="card" id="sync-card">
+        <div class="card-head">
+          <div class="card-title">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M20 12C20 16.4183 16.4183 20 12 20C9.5 20 7.28 18.84 5.83 17.04M4 12C4 7.58172 7.58172 4 12 4C14.5 4 16.72 5.16 18.17 6.96" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 17V13H8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 7V11H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <h2>Run a sync</h2>
+          </div>
+        </div>
 
-      <dl class="status-grid">
-        <dt>Last run</dt><dd id="last-run">—</dd>
-        <dt>Tracked products</dt><dd id="tracked-products">—</dd>
-      </dl>
+        <form id="sync-form">
+          <label class="toggle-row">
+            <span>Full sync <em>ignore last-run timestamp</em></span>
+            <span class="switch"><input type="checkbox" id="opt-full" /><span class="slider"></span></span>
+          </label>
+          <label class="toggle-row">
+            <span>Dry run <em>write nothing</em></span>
+            <span class="switch"><input type="checkbox" id="opt-dry-run" checked /><span class="slider"></span></span>
+          </label>
+          <label class="toggle-row">
+            <span>Force <em>rewrite unchanged products</em></span>
+            <span class="switch"><input type="checkbox" id="opt-force" /><span class="slider"></span></span>
+          </label>
+          <label class="field-row">
+            <span>Limit</span>
+            <input type="number" id="opt-limit" min="1" placeholder="no limit" />
+          </label>
+          <button type="submit" id="sync-btn" class="btn btn-primary">
+            <span>Run sync</span>
+            <svg viewBox="0 0 24 24" fill="none" class="btn-arrow"><path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </form>
+      </section>
+    </div>
 
-      <div id="summary" class="summary hidden">
-        <div class="summary-item"><span id="sum-scanned">0</span><label>scanned</label></div>
-        <div class="summary-item ok"><span id="sum-created">0</span><label>created</label></div>
-        <div class="summary-item ok"><span id="sum-updated">0</span><label>updated</label></div>
-        <div class="summary-item"><span id="sum-skipped">0</span><label>skipped</label></div>
-        <div class="summary-item err"><span id="sum-failed">0</span><label>failed</label></div>
-      </div>
+    <section class="summary hidden" id="summary">
+      <div class="summary-item"><span id="sum-scanned">0</span><label>Scanned</label></div>
+      <div class="summary-item ok"><span id="sum-created">0</span><label>Created</label></div>
+      <div class="summary-item ok"><span id="sum-updated">0</span><label>Updated</label></div>
+      <div class="summary-item"><span id="sum-skipped">0</span><label>Skipped</label></div>
+      <div class="summary-item err"><span id="sum-failed">0</span><label>Failed</label></div>
     </section>
 
     <section class="card wide" id="logs-card">
       <div class="card-head">
-        <h2>Live log</h2>
-        <button id="clear-log-btn" class="btn btn-secondary">Clear</button>
+        <div class="card-title">
+          <span class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 5H20M4 12H14M4 19H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </span>
+          <h2>Live log</h2>
+        </div>
+        <button id="clear-log-btn" class="btn btn-ghost">Clear</button>
       </div>
       <pre id="log-console"></pre>
     </section>
   </main>
+
+  <footer>
+    <span>Syncline · local dashboard for the Shopify → Medusa sync engine</span>
+  </footer>
 
   <script src="/app.js"></script>
 </body>

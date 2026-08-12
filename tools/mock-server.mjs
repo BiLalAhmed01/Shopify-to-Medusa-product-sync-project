@@ -208,6 +208,13 @@ const medusaServer = http.createServer(async (req, res) => {
   }
 
   // inventory
+  if (method === "GET" && /^\/admin\/inventory-items\/[^/]+\/location-levels\/[^/]+$/.test(path)) {
+    const [, , , itemId, , locationId] = path.split("/");
+    const key = `${itemId}:${locationId}`;
+    const quantity = db.levels[key];
+    if (quantity === undefined) return json(res, 404, { message: "level not found" });
+    return json(res, 200, { inventory_item_id: itemId, location_id: locationId, stocked_quantity: quantity });
+  }
   if (method === "POST" && /^\/admin\/inventory-items\/[^/]+\/location-levels\/[^/]+$/.test(path)) {
     const [, , , itemId, , locationId] = path.split("/");
     const key = `${itemId}:${locationId}`;

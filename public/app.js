@@ -35,9 +35,11 @@ async function refreshStatus() {
 }
 
 function setBusy(busy) {
-  els.busyBadge.classList.toggle("hidden", !busy);
+  els.busyBadge.textContent = busy ? "Syncing…" : "Idle";
+  els.busyBadge.classList.toggle("status-busy", busy);
+  els.busyBadge.classList.toggle("status-idle", !busy);
   els.syncBtn.disabled = busy;
-  els.syncBtn.textContent = busy ? "Running…" : "Run sync";
+  els.syncBtn.querySelector("span").textContent = busy ? "Running…" : "Run sync";
 }
 
 function showSummary(summary) {
@@ -67,7 +69,11 @@ async function runCheck() {
     for (const [key, label] of Object.entries(labels)) {
       const entry = data[key];
       const li = document.createElement("li");
-      li.innerHTML = `<span class="dot ${entry.ok ? "ok" : "err"}"></span><strong>${label}:</strong> ${entry.detail}`;
+      li.className = entry.ok ? "ok" : "err";
+      const icon = entry.ok
+        ? '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/><path d="M7 12.5L10.5 16L17 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/><path d="M12 8V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.2" r="1.1" fill="currentColor"/></svg>';
+      li.innerHTML = `<span class="check-icon">${icon}</span><span class="check-text"><strong>${label}</strong><small>${entry.detail}</small></span>`;
       els.checksList.appendChild(li);
     }
   } catch (error) {
