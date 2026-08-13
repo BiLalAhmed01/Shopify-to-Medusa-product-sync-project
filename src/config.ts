@@ -1,13 +1,5 @@
-/**
- * config.ts
- * -----------------------------------------------------------------------------
- * Reads the .env file ONCE and turns it into a typed object.
- *
- * Why bother? Because `process.env.SHOPIFY_SHOP` is `string | undefined`
- * everywhere in your code. Validating here means the rest of the app can trust
- * the values, and a missing variable fails immediately with a clear message
- * instead of a confusing 401 twenty seconds later.
- */
+// Reads .env once and exposes it as a typed, validated object so the rest of
+// the app never has to deal with `string | undefined`.
 import "dotenv/config";
 
 function str(name: string, fallback?: string): string {
@@ -39,14 +31,11 @@ function int(name: string, fallback: number): number {
 
 export const config = {
   shopify: {
-    /** e.g. "my-store.myshopify.com" — we strip protocol/slashes defensively. */
+    /** e.g. "my-store.myshopify.com" - we strip protocol/slashes defensively. */
     shop: str("SHOPIFY_SHOP").replace(/^https?:\/\//, "").replace(/\/$/, ""),
     accessToken: str("SHOPIFY_ACCESS_TOKEN"),
     apiVersion: str("SHOPIFY_API_VERSION", "2026-07"),
-    /**
-     * Dev-only escape hatch: point the client at a local mock instead of the
-     * real https://<shop> host. Leave unset in production.
-     */
+    // Dev-only: point at a local mock instead of the real host. Unset in production.
     apiBaseUrl: optional("SHOPIFY_API_BASE_URL"),
     webhookSecret: optional("SHOPIFY_WEBHOOK_SECRET"),
     webhookPort: int("WEBHOOK_PORT", 4000),
@@ -64,10 +53,7 @@ export const config = {
     salesChannelId: optional("MEDUSA_SALES_CHANNEL_ID"),
     stockLocationId: optional("MEDUSA_STOCK_LOCATION_ID"),
     currencyCode: str("MEDUSA_CURRENCY_CODE", "usd").toLowerCase(),
-    /**
-     * Medusa v2 stores prices as decimals (19.99).
-     * Medusa v1 stored them as integer minor units (1999).
-     */
+    // v2 stores prices as decimals (19.99); v1 used integer minor units (1999).
     priceFormat: (optional("MEDUSA_PRICE_FORMAT") ?? "decimal") as "decimal" | "cents",
   },
 

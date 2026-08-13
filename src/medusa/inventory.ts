@@ -1,21 +1,11 @@
-/**
- * medusa/inventory.ts
- * -----------------------------------------------------------------------------
- * Sync stock quantities.
- *
- * How inventory is modelled in Medusa v2 (this trips up most beginners):
- *
- *   ProductVariant  --(manage_inventory: true)-->  InventoryItem
- *   InventoryItem   --(per warehouse)---------->  InventoryLevel { stocked_quantity }
- *
- * So a quantity is never stored "on the variant". It lives on an inventory
- * level, which belongs to an inventory item, at a specific stock location.
- * That is why MEDUSA_STOCK_LOCATION_ID is required for inventory sync.
- *
- * Shopify can track stock across many locations too; here we sum Shopify's
- * total available quantity into one Medusa location, which is the right default
- * for a single-warehouse store. Multi-location mapping is noted in the README.
- */
+// Syncs stock quantities.
+//
+// Medusa v2's inventory chain: ProductVariant (manage_inventory: true) ->
+// InventoryItem -> InventoryLevel { stocked_quantity } per stock location.
+// A quantity is never stored directly on the variant, which is why
+// MEDUSA_STOCK_LOCATION_ID is required here. Shopify's per-location
+// quantities are summed into that one Medusa location (single-warehouse
+// default; see README for multi-location).
 import { medusaRequest, HttpError } from "./client.js";
 import { config } from "../config.js";
 import { log } from "../logger.js";
@@ -36,7 +26,7 @@ export async function setVariantStock(
   if (!inventoryItemId) {
     log.debug(
       `Variant ${variant.title} has no inventory item ` +
-        `(manage_inventory is probably false) — skipping stock update`
+        `(manage_inventory is probably false) - skipping stock update`
     );
     return false;
   }
@@ -54,7 +44,7 @@ export async function setVariantStock(
     const notFound = error instanceof HttpError && (error.status === 404 || error.status === 400);
     if (!notFound) throw error;
 
-    // No level exists at this location yet — create it.
+    // No level exists at this location yet - create it.
     await medusaRequest(
       "POST",
       `/admin/inventory-items/${inventoryItemId}/location-levels`,

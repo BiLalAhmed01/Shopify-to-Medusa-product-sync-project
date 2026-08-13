@@ -1,22 +1,14 @@
-/**
- * tools/mock-server.mjs
- * -----------------------------------------------------------------------------
- * A fake Shopify + fake Medusa in one small process, using only Node built-ins.
- *
- * Why this exists: you should be able to run and review this project without
- * owning a Shopify store or running a Postgres database. It also makes the sync
- * logic testable — the demo below proves that a second run updates instead of
- * duplicating, which is the single most important property of a sync.
- *
- *   node tools/mock-server.mjs          # listens on :7000 (Shopify) and :7001 (Medusa)
- *   npm run demo                        # starts it, runs a sync twice, prints the result
- */
+// Fake Shopify + fake Medusa in one process, Node built-ins only, so the
+// sync can be run and tested without a real store or database.
+//
+//   node tools/mock-server.mjs   # :7000 (Shopify) and :7001 (Medusa)
+//   npm run demo                 # starts it and runs the sync 3x
 import http from "node:http";
 
 const SHOPIFY_PORT = Number(process.env.MOCK_SHOPIFY_PORT ?? 7000);
 const MEDUSA_PORT = Number(process.env.MOCK_MEDUSA_PORT ?? 7001);
 
-/* ----------------------------- fake Shopify ------------------------------ */
+// fake Shopify
 
 const now = new Date().toISOString();
 
@@ -116,7 +108,7 @@ const shopifyServer = http.createServer(async (req, res) => {
   return json(res, 200, { data: {} });
 });
 
-/* ------------------------------ fake Medusa ------------------------------ */
+// fake Medusa
 
 const db = { products: [], categories: [], levels: {} };
 let seq = 1;
@@ -246,7 +238,7 @@ function makeVariant(payload) {
   };
 }
 
-/* ------------------------------- helpers -------------------------------- */
+// helpers
 
 function readBody(req) {
   return new Promise((resolve) => {

@@ -1,11 +1,6 @@
-/**
- * types.ts
- * -----------------------------------------------------------------------------
- * The shape of the data we read from Shopify and the shape we send to Medusa.
- * Writing these down is what makes the mapper safe to change later.
- */
+// Shapes of the data read from Shopify and sent to Medusa.
 
-/* ------------------------------- Shopify -------------------------------- */
+/* Shopify */
 
 export interface ShopifyImage {
   url: string;
@@ -49,7 +44,7 @@ export interface ShopifyProduct {
   };
 }
 
-/* -------------------------------- Medusa -------------------------------- */
+/* Medusa */
 
 export interface MedusaPrice {
   currency_code: string;

@@ -1,19 +1,7 @@
-/**
- * shopify/products.ts
- * -----------------------------------------------------------------------------
- * Pulls products out of Shopify, one page at a time.
- *
- * Two ideas worth understanding here:
- *
- * 1. CURSOR PAGINATION. Shopify never gives you "page 3". It gives you a
- *    cursor pointing at the last row you saw, and you ask for "the next N
- *    after this cursor". We loop until `hasNextPage` is false.
- *
- * 2. INCREMENTAL SYNC. The `query` argument accepts a search filter. Passing
- *    `updated_at:>2026-08-01T00:00:00Z` means Shopify only returns products
- *    that changed since the last run — which is what makes a nightly sync take
- *    seconds instead of hours.
- */
+// Pulls products out of Shopify, one page at a time, using cursor
+// pagination (loop until `hasNextPage` is false; Shopify has no "page N").
+// The `query` argument passes an `updated_at:>...` filter for incremental
+// syncs, so a nightly run only re-fetches what actually changed.
 import { shopifyGraphQL } from "./client.js";
 import { log } from "../logger.js";
 import { config } from "../config.js";
@@ -77,7 +65,7 @@ interface ProductsPage {
 }
 
 export interface FetchOptions {
-  /** ISO timestamp — only return products updated after this moment. */
+  /** ISO timestamp - only return products updated after this moment. */
   updatedSince?: string | null;
   /** Stop after this many products (handy while testing). */
   limit?: number | null;
@@ -126,7 +114,7 @@ export async function* iterateShopifyProducts(
   }
 }
 
-/** Fetch a single product — used by the webhook server. */
+/** Fetch a single product - used by the webhook server. */
 export async function fetchShopifyProduct(gid: string): Promise<ShopifyProduct | null> {
   const data = await shopifyGraphQL<{ product: ShopifyProduct | null }>(
     PRODUCT_BY_ID_QUERY,

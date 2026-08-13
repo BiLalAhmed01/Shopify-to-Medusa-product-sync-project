@@ -1,16 +1,6 @@
-/**
- * mapper.test.ts
- * -----------------------------------------------------------------------------
- * Run with:  npm test
- *
- * The mapper is a pure function, which makes it the easiest and most valuable
- * thing in the project to test: no network, no database, no mocks. If a mapping
- * rule ever changes, these tests say exactly what broke.
- *
- * Note the dynamic import at the top — `config.ts` reads environment variables
- * when it is first imported, so the fake env has to be in place before that
- * happens.
- */
+// Unit tests for mapper.ts (npm test). Pure function, no network/DB/mocks
+// needed. The dynamic import below is deliberate: config.ts reads env vars
+// on first import, so the fake env has to be set before that import runs.
 import test from "node:test";
 import assert from "node:assert/strict";
 import type { ShopifyProduct } from "./types.js";

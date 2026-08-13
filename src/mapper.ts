@@ -1,36 +1,21 @@
-/**
- * mapper.ts
- * -----------------------------------------------------------------------------
- * THE most important file to review.
- *
- * Everything else is plumbing; this is the business logic — the field-by-field
- * translation from Shopify's model to Medusa's model. Keeping it in one pure
- * function (no network calls, no side effects) means you can reason about it,
- * test it with a saved Shopify JSON fixture, and change a mapping rule without
- * touching the sync engine.
- *
- * Mapping table
- * -------------------------------------------------------------------------
- *  Shopify                        Medusa
- *  -----------------------------  ----------------------------------------
- *  title                          title
- *  handle                         handle            (our join key)
- *  descriptionHtml                description       (HTML stripped to text)
- *  status ACTIVE                  status published; anything else -> draft
- *  featuredImage.url              thumbnail
- *  images.nodes[].url             images[].url
- *  collections[].title            product categories (created on demand)
- *  productType                    fallback category + metadata
- *  tags                           tags[].value
- *  options[].name/optionValues    options[].title/values
- *  variant.price                  variant.prices[0].amount
- *  variant.sku / barcode          variant.sku / barcode
- *  variant.inventoryQuantity      inventory level stocked_quantity
- *  variant.inventoryPolicy        variant.allow_backorder (CONTINUE -> true)
- *  inventoryItem.tracked          variant.manage_inventory
- *  inventoryItem.measurement      variant.weight (converted to grams)
- *  id / variant.id                metadata.shopify_id / shopify_variant_id
- */
+// Field-by-field translation from Shopify's product model to Medusa's.
+// Pure function, no network calls, so it's easy to unit-test against a
+// saved fixture and safe to change without touching the sync engine.
+//
+// Mapping summary:
+//  title / handle / descriptionHtml -> title / handle / description (HTML stripped)
+//  status ACTIVE -> published, anything else -> draft
+//  featuredImage + images[] -> thumbnail + images[]
+//  collections[] (or productType fallback) -> product categories, created on demand
+//  tags -> tags[]
+//  options + variant.selectedOptions -> options[] + variant.options
+//  variant.price -> variant.prices[0].amount
+//  variant.sku / barcode -> same
+//  variant.inventoryQuantity -> inventory level stocked_quantity
+//  variant.inventoryPolicy CONTINUE -> variant.allow_backorder
+//  inventoryItem.tracked -> variant.manage_inventory
+//  inventoryItem.measurement -> variant.weight (grams)
+//  product/variant id -> metadata.shopify_id / shopify_variant_id
 import { config } from "./config.js";
 import { htmlToText, numericIdFromGid, toGrams, toMedusaAmount } from "./utils.js";
 import type {

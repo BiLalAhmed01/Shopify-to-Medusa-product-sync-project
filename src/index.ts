@@ -1,16 +1,12 @@
-/**
- * index.ts
- * -----------------------------------------------------------------------------
- * Command line entry point.
- *
- *   npm run check                     verify both connections and the config
- *   npm run sync                      incremental sync (only what changed)
- *   npm run sync -- --full            re-sync the whole catalogue
- *   npm run sync -- --dry-run         show the plan, write nothing
- *   npm run sync -- --limit 5         only the first 5 products (smoke test)
- *   npm run sync -- --since 2026-08-01T00:00:00Z
- *   npm run sync -- --force           rewrite even unchanged products
- */
+// CLI entry point.
+//
+//   npm run check                     verify both connections and the config
+//   npm run sync                      incremental sync (only what changed)
+//   npm run sync -- --full            re-sync the whole catalogue
+//   npm run sync -- --dry-run         show the plan, write nothing
+//   npm run sync -- --limit 5         only the first 5 products (smoke test)
+//   npm run sync -- --since 2026-08-01T00:00:00Z
+//   npm run sync -- --force           rewrite even unchanged products
 import { runSync } from "./sync.js";
 import { pingShopify } from "./shopify/client.js";
 import { pingMedusa } from "./medusa/client.js";
@@ -53,14 +49,14 @@ async function check(): Promise<void> {
   if (config.medusa.salesChannelId) {
     log.info(`  ✓ Sales channel : ${config.medusa.salesChannelId}`);
   } else {
-    log.warn("  ! No MEDUSA_SALES_CHANNEL_ID set — products will not appear in a storefront");
+    log.warn("  ! No MEDUSA_SALES_CHANNEL_ID set - products will not appear in a storefront");
   }
 
   if (config.medusa.stockLocationId) {
     const name = await verifyStockLocation();
     log.info(`  ✓ Stock location : ${name ?? config.medusa.stockLocationId}`);
   } else {
-    log.warn("  ! No MEDUSA_STOCK_LOCATION_ID set — inventory sync is disabled");
+    log.warn("  ! No MEDUSA_STOCK_LOCATION_ID set - inventory sync is disabled");
   }
 
   log.info(`  ✓ Price format : ${config.medusa.priceFormat} (${config.medusa.currencyCode})`);

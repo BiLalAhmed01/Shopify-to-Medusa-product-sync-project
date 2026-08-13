@@ -1,17 +1,10 @@
-/**
- * shopify/client.ts
- * -----------------------------------------------------------------------------
- * A minimal Shopify GraphQL Admin API client.
- *
- * Why GraphQL and not REST?
- *   Shopify marked the REST Admin API as legacy in October 2024. Product and
- *   variant endpoints in particular are GraphQL-only for new apps, so any
- *   integration written today should use GraphQL.
- *
- * Rate limiting on GraphQL is not "N requests per second" — it is a leaky
- * bucket of *cost points*. Every response tells you how many points you have
- * left, so we pause when the bucket runs low instead of waiting for a 429.
- */
+// Minimal Shopify GraphQL Admin API client. GraphQL over REST because
+// Shopify marked REST Admin legacy in Oct 2024 and product/variant endpoints
+// are GraphQL-only for new apps.
+//
+// Rate limiting here is a cost-point bucket, not requests/sec. Every
+// response reports points remaining, so we pause proactively when the
+// bucket runs low instead of waiting to get a 429.
 import { config } from "../config.js";
 import { requestWithRetry, parseJsonOrThrow, sleep } from "../http.js";
 import { log } from "../logger.js";
@@ -71,7 +64,7 @@ async function respectCostBudget(cost: QueryCost | undefined): Promise<void> {
   if (currentlyAvailable < maximumAvailable * 0.2) {
     const pointsNeeded = maximumAvailable * 0.5 - currentlyAvailable;
     const waitMs = Math.ceil((pointsNeeded / restoreRate) * 1000);
-    log.info(`Shopify rate-limit bucket low — pausing ${waitMs}ms to let it refill`);
+    log.info(`Shopify rate-limit bucket low - pausing ${waitMs}ms to let it refill`);
     await sleep(waitMs);
   }
 }

@@ -1,14 +1,6 @@
-/**
- * http.ts
- * -----------------------------------------------------------------------------
- * Every call to Shopify or Medusa goes through this file.
- *
- * Real integrations fail for boring reasons: the network blips, the API is
- * rate-limited (HTTP 429), or the server restarts (HTTP 5xx). Retrying those
- * with an increasing delay ("exponential backoff") turns most of them into a
- * non-event. We deliberately do NOT retry 4xx errors other than 429, because a
- * 400/401/404 means *we* sent something wrong and retrying will not fix it.
- */
+// Shared fetch wrapper with exponential backoff, used for every Shopify and
+// Medusa call. Retries 429/5xx and network errors; 4xx other than 429 means
+// we sent something wrong, so retrying won't help.
 import { log } from "./logger.js";
 
 export class HttpError extends Error {
@@ -54,7 +46,7 @@ export async function requestWithRetry(
 
       if (attempt === retries) return response; // give up, let caller read the body
       log.warn(
-        `Got HTTP ${response.status} from ${new URL(url).pathname} — ` +
+        `Got HTTP ${response.status} from ${new URL(url).pathname} - ` +
           `retrying in ${delay}ms (attempt ${attempt + 1}/${retries})`
       );
       await sleep(delay);
@@ -63,7 +55,7 @@ export async function requestWithRetry(
       lastError = error;
       if (attempt === retries) break;
       const delay = baseDelayMs * 2 ** attempt;
-      log.warn(`Network error calling ${url} — retrying in ${delay}ms`, String(error));
+      log.warn(`Network error calling ${url} - retrying in ${delay}ms`, String(error));
       await sleep(delay);
     }
   }

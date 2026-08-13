@@ -1,27 +1,18 @@
-/**
- * webhook-server.ts
- * -----------------------------------------------------------------------------
- * OPTIONAL, but it is what turns "a nightly job" into "near real-time sync".
- *
- * Shopify can POST to a URL whenever a product is created, updated or deleted.
- * We verify the signature, then run the same sync path used by the CLI.
- *
- * Two things beginners usually get wrong here, both handled below:
- *
- * 1. SIGNATURE VERIFICATION must run against the RAW request body. If Express
- *    parses the JSON first, re-serialising it changes whitespace and the HMAC
- *    will never match. Hence `express.raw()`.
- *
- * 2. ANSWER FAST. Shopify expects a 2xx within ~5 seconds and retries if it
- *    does not get one. So we reply 200 immediately and do the sync afterwards.
- *
- * Setup:
- *   npm run webhooks
- *   npx ngrok http 4000          (or deploy somewhere public)
- *   In Shopify: Settings -> Notifications -> Webhooks, subscribe
- *   products/create, products/update, products/delete to
- *   https://<your-url>/webhooks/shopify
- */
+// Optional near-real-time listener: Shopify POSTs here on product
+// create/update/delete, we verify the signature and run the same sync path
+// as the CLI.
+//
+// Signature verification needs the RAW request body (`express.raw()`) - if
+// Express parses JSON first, re-serializing changes whitespace and the HMAC
+// won't match. We also reply 200 immediately and sync afterward, since
+// Shopify expects a 2xx within ~5s and retries otherwise.
+//
+// Setup:
+//   npm run webhooks
+//   npx ngrok http 4000          (or deploy somewhere public)
+//   In Shopify: Settings -> Notifications -> Webhooks, subscribe
+//   products/create, products/update, products/delete to
+//   https://<your-url>/webhooks/shopify
 import crypto from "node:crypto";
 import express from "express";
 import { config } from "./config.js";
@@ -35,7 +26,7 @@ const app = express();
 
 function isValidSignature(rawBody: Buffer, signature: string | undefined): boolean {
   if (!config.shopify.webhookSecret) {
-    log.warn("SHOPIFY_WEBHOOK_SECRET is not set — refusing to trust this webhook");
+    log.warn("SHOPIFY_WEBHOOK_SECRET is not set - refusing to trust this webhook");
     return false;
   }
   if (!signature) return false;
@@ -102,7 +93,7 @@ async function handleWebhook(topic: string, payload: { id: number; handle?: stri
 }
 
 /**
- * Deleting in Shopify does not delete in Medusa — orders may reference the
+ * Deleting in Shopify does not delete in Medusa - orders may reference the
  * product. Setting it to draft hides it from the storefront while keeping the
  * history intact. That is the safer default; change it if the business wants
  * hard deletes.

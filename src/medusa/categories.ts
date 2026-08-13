@@ -1,15 +1,6 @@
-/**
- * medusa/categories.ts
- * -----------------------------------------------------------------------------
- * Shopify organises products with "collections" and a "product type".
- * Medusa organises them with "product categories".
- *
- * This module implements find-or-create: given a category name, return an
- * existing Medusa category id if one matches, otherwise create it.
- *
- * The in-memory cache matters. Without it, syncing 2,000 products in 40
- * collections would issue 2,000 lookups for the same handful of categories.
- */
+// Maps Shopify collections/product type to Medusa product categories via
+// find-or-create, with an in-memory cache so a 2,000-product sync across 40
+// collections doesn't issue 2,000 redundant lookups.
 import { medusaRequest } from "./client.js";
 import { log } from "../logger.js";
 import { slugify } from "../utils.js";

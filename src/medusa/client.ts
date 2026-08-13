@@ -1,21 +1,8 @@
-/**
- * medusa/client.ts
- * -----------------------------------------------------------------------------
- * Talks to the Medusa v2 Admin REST API.
- *
- * Authentication in Medusa v2 works one of two ways:
- *
- *   A) Email + password -> POST /auth/user/emailpass returns a JWT.
- *      Send it as `Authorization: Bearer <jwt>`.
- *      (In v1 you used the `x-medusa-access-token` header. That is gone.)
- *
- *   B) A secret admin API key -> `Authorization: Basic base64("<key>:")`.
- *      Better for servers and CI because it does not expire.
- *
- * The JWT expires, so if a request comes back 401 we log in again once and
- * retry. That single detail is the difference between a script that survives a
- * long import and one that dies halfway through.
- */
+// Medusa v2 Admin REST client.
+//
+// Two auth modes: email/password via POST /auth/user/emailpass (JWT, expires
+// so a 401 triggers one re-login + retry), or a secret admin API key sent as
+// HTTP Basic auth (doesn't expire, preferred for servers/CI).
 import { config, assertMedusaAuthConfigured } from "../config.js";
 import { requestWithRetry, parseJsonOrThrow, HttpError } from "../http.js";
 import { log } from "../logger.js";
@@ -77,7 +64,7 @@ export async function medusaRequest<T>(
   });
 
   if (response.status === 401 && retryOn401 && !config.medusa.apiKey) {
-    log.warn("Medusa token expired — re-authenticating");
+    log.warn("Medusa token expired - re-authenticating");
     cachedToken = null;
     await authHeader(true);
     return medusaRequest<T>(method, path, body, { retryOn401: false });

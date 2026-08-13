@@ -1,12 +1,6 @@
-/**
- * tools/demo.mjs
- * -----------------------------------------------------------------------------
- * `npm run demo` — a full end-to-end run with no credentials required.
- *
- * It starts the mock Shopify + Medusa servers, then runs the real sync code
- * TWICE. The second run is the interesting one: it must UPDATE the same two
- * products rather than creating two more. That is the proof of idempotence.
- */
+// npm run demo - end-to-end run against mock Shopify + Medusa, no
+// credentials required. Runs the real sync three times: create, then
+// no-op (nothing changed), then --force update, to demonstrate idempotence.
 import { spawn } from "node:child_process";
 import { rm } from "node:fs/promises";
 

@@ -1,19 +1,7 @@
-/**
- * medusa/products.ts
- * -----------------------------------------------------------------------------
- * Create and update products in Medusa.
- *
- * The hard part of any sync is not "create a product" — it is "create it if it
- * is new, update it if it already exists, and do not duplicate anything if the
- * script runs twice". That property is called IDEMPOTENCE and it is what the
- * code below is really about.
- *
- * We identify an already-synced product in two ways, in order:
- *   1. the local state file (Shopify product id -> Medusa product id)
- *   2. the `handle`, which is unique in both systems
- * and we always write the Shopify id into `metadata` so the link survives even
- * if the state file is deleted.
- */
+// Create/update products in Medusa, keeping the sync idempotent: an existing
+// product is matched first by the local state file (Shopify id -> Medusa
+// id), then by `handle`. The Shopify id is also written into `metadata` so
+// the link survives even if the state file is lost.
 import { medusaRequest, HttpError } from "./client.js";
 import { log } from "../logger.js";
 import { config } from "../config.js";
@@ -106,9 +94,7 @@ export async function updateProduct(
   }
 }
 
-/* --------------------------------------------------------------------------
- * Variant reconciliation
- * ------------------------------------------------------------------------ */
+// Variant reconciliation
 
 function keysFor(variant: { sku?: string | null; title?: string; metadata?: Record<string, unknown> | null }) {
   const shopifyId = variant.metadata?.["shopify_variant_id"];

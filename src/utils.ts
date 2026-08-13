@@ -1,9 +1,4 @@
-/**
- * utils.ts
- * -----------------------------------------------------------------------------
- * Small pure functions with no side effects. Pure functions are the easiest
- * things in a codebase to unit-test, so keeping them together is deliberate.
- */
+// Small pure helpers, kept side-effect free so they're easy to unit-test.
 import { config } from "./config.js";
 
 /** "Men's T-Shirts & Tops" -> "mens-t-shirts-tops" */

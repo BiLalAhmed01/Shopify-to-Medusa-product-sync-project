@@ -1,19 +1,8 @@
-/**
- * state.ts
- * -----------------------------------------------------------------------------
- * Remembers what happened last time, in a small JSON file.
- *
- * Two jobs:
- *   1. `lastRunAt` powers the incremental sync (only fetch what changed).
- *   2. `products` maps Shopify product id -> Medusa product id, so a rename in
- *      Shopify (which changes the handle) updates the existing Medusa product
- *      instead of creating a duplicate.
- *
- * A JSON file is the right call for a single-instance job. If this ever runs on
- * multiple workers at once, move this table into Postgres or Redis — the
- * interface below is deliberately small enough that swapping it is a one-file
- * change.
- */
+// Persists sync state to a small JSON file: the last run timestamp (for
+// incremental syncs) and a Shopify id -> Medusa id map (so a handle rename
+// in Shopify updates the existing Medusa product instead of duplicating it).
+// A JSON file is fine for a single instance; for multiple workers this
+// interface is small enough to swap for Postgres/Redis without touching callers.
 import { readFile, writeFile, rename } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { config } from "./config.js";
@@ -24,7 +13,7 @@ const EMPTY: SyncState = { lastRunAt: null, products: {} };
 
 export async function loadState(): Promise<SyncState> {
   if (!existsSync(config.sync.stateFile)) {
-    log.debug("No state file yet — treating this as a first run");
+    log.debug("No state file yet - treating this as a first run");
     return structuredClone(EMPTY);
   }
   try {
@@ -32,7 +21,7 @@ export async function loadState(): Promise<SyncState> {
     const parsed = JSON.parse(raw) as SyncState;
     return { lastRunAt: parsed.lastRunAt ?? null, products: parsed.products ?? {} };
   } catch (error) {
-    log.warn("State file is unreadable — starting fresh", String(error));
+    log.warn("State file is unreadable - starting fresh", String(error));
     return structuredClone(EMPTY);
   }
 }

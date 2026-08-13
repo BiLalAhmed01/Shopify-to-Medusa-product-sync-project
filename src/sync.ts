@@ -1,16 +1,9 @@
-/**
- * sync.ts
- * -----------------------------------------------------------------------------
- * The engine. Reads products from Shopify, decides create vs update vs skip,
- * writes to Medusa, then updates stock levels.
- *
- * Order of operations per product (this order is not arbitrary):
- *   1. resolve categories   — a product cannot reference a category that
- *                             does not exist yet
- *   2. create/update product
- *   3. reconcile variants   — needs the product id from step 2
- *   4. set stock levels     — needs the variant ids from step 3
- */
+// Sync engine: reads products from Shopify, decides create/update/skip,
+// writes to Medusa, then updates stock levels.
+//
+// Per product, in order: resolve categories (must exist before the product
+// references them) -> create/update the product -> reconcile variants
+// (needs the product id) -> set stock levels (needs the variant ids).
 import { iterateShopifyProducts } from "./shopify/products.js";
 import { fetchShopCurrency } from "./shopify/client.js";
 import {
@@ -66,7 +59,7 @@ export async function runSync(options: SyncOptions = {}): Promise<SyncSummary> {
 
   log.info(
     `Starting ${options.full ? "FULL" : "INCREMENTAL"} sync` +
-      `${options.dryRun ? " (DRY RUN — nothing will be written)" : ""}` +
+      `${options.dryRun ? " (DRY RUN - nothing will be written)" : ""}` +
       ` | currency=${currencyCode}`
   );
 
@@ -114,7 +107,7 @@ export async function syncOneProduct(
 
   // Fast path: Shopify says nothing changed since we last wrote this product.
   if (!options.force && known && known.shopifyUpdatedAt === product.updatedAt) {
-    log.debug(`Skipping "${product.handle}" — unchanged since ${known.shopifyUpdatedAt}`);
+    log.debug(`Skipping "${product.handle}" - unchanged since ${known.shopifyUpdatedAt}`);
     return "skipped";
   }
 

@@ -1,9 +1,4 @@
-/**
- * logger.ts
- * -----------------------------------------------------------------------------
- * A tiny logger. In a bigger project you would use pino or winston, but for a
- * sync script this keeps the dependency list short and the output readable.
- */
+// Minimal levelled logger. Avoids pulling in pino/winston for a script this size.
 import { config } from "./config.js";
 import { publish } from "./log-bus.js";
 

@@ -1,15 +1,9 @@
-/**
- * dashboard-server.ts
- * -----------------------------------------------------------------------------
- * A small local web UI for the sync tool: connection status, a button to run a
- * sync (with the same flags the CLI takes), a live log stream, and the last
- * summary. It calls the exact same runSync()/pingShopify()/pingMedusa() used
- * by the CLI — this is a frontend for the existing engine, not a second one.
- *
- * Setup:
- *   npm run dashboard
- *   open http://localhost:5050
- */
+// Local web UI for the sync tool: connection status, a button to run a sync
+// with the same flags the CLI takes, a live log stream, and the last
+// summary. Calls the same runSync()/pingShopify()/pingMedusa() as the CLI.
+//
+//   npm run dashboard
+//   open http://localhost:5050
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
@@ -71,12 +65,12 @@ app.get("/api/check", async (_req, res) => {
       result.stockLocation = { ok: false, detail: message(error) };
     }
   } else {
-    result.stockLocation = { ok: false, detail: "MEDUSA_STOCK_LOCATION_ID not set — inventory sync disabled" };
+    result.stockLocation = { ok: false, detail: "MEDUSA_STOCK_LOCATION_ID not set - inventory sync disabled" };
   }
 
   result.salesChannel = config.medusa.salesChannelId
     ? { ok: true, detail: config.medusa.salesChannelId }
-    : { ok: false, detail: "MEDUSA_SALES_CHANNEL_ID not set — products won't appear in a storefront" };
+    : { ok: false, detail: "MEDUSA_SALES_CHANNEL_ID not set - products won't appear in a storefront" };
 
   res.json(result);
 });

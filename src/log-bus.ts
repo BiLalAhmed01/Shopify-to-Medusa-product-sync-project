@@ -1,11 +1,6 @@
-/**
- * log-bus.ts
- * -----------------------------------------------------------------------------
- * Lets the dashboard's SSE endpoint show live log lines without changing how
- * logger.ts behaves for the CLI. logger.ts pushes every line here in addition
- * to printing it; nothing subscribes in normal CLI usage, so this is a no-op
- * cost (one array push) outside of the dashboard.
- */
+// In-memory pub/sub so the dashboard's SSE endpoint can show live log lines.
+// logger.ts pushes every line here; nothing subscribes outside the dashboard,
+// so plain CLI usage pays only the cost of one array push per line.
 import { EventEmitter } from "node:events";
 import type { Level } from "./logger.js";
 
